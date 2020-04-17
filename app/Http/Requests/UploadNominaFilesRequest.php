@@ -25,6 +25,7 @@ class UploadNominaFilesRequest extends FormRequest
     {
         return [
             //
+            'files' => 'required',
             'files.*' => 'required|mimes:csv,xls,xlsx,xlsm,txt|max:2048'
         ];
     }

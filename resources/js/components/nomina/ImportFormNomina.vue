@@ -20,13 +20,18 @@
 </template>
 
 <script>
+    import auth from '../../contants/auth';
+    import importNomina from '../../api/importNomina';
+
     export default {
         name: "ImportFormNomina",
         data() {
             return {
              success: false,
               errors: null,
-               files: []
+               files: [],
+               successMessage: '',
+               successData: null
             };
         },
         methods: {
@@ -50,36 +55,25 @@
                   Iteate over any file sent over appending the files
                   to the form data.
                 */
-                for( var i = 0; i < this.files.length; i++ ){
-                    let file = this.files[i];
-                    console.log('file', file);
-                    formData.append('files[' + i + ']', file);
+                for ( var i = 0; i < this.files.length; i++ ) {
+                    formData.append('files[' + i + ']', this.files[i]);
                 }
-
-                /*
-                  Additional POST Data
-                */
-                formData.append('first_name', 'Dan');
-                formData.append('last_name', 'Pastori');
 
                 /*
                   Make the request to the POST /select-files URL
                 */
-                window.axios.post( '/api/upload-nomina-files',
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
+                console.log('importNomina', importNomina);
+                try {
+                    this.successData = importNomina.store(formData);
+
+                } catch (e) {
+                    if(err.response.data.message === unAuthenticatedMessage) {
+                        window.location = auth.LOGIN_URL
                     }
-                ).then(() => {
-                    console.log('SUCCESS!!');
-                }).catch((err) => {
-                    if(err.response.data.message === 'Unauthenticated.') {
-                        window.location = '/login'
-                    }
+                    this.errors = err.response.data;
+
                     console.log('FAILURE!!');
-                });
+                }
             },
 
             /*
